@@ -1,120 +1,138 @@
 {
-    "fixeddata":{
-	"userid" :"",
-	"carid" :"",
-	"toAutoware":"UtoA",
-	"fromAutoware":"AtoU"
+  "fixeddata": {
+    "userid": "",
+    "carid": "",
+    "toAutoware": "UtoA",
+    "fromAutoware": "AtoU"
+  },
+  "topicdata": {
+    "buttonInit": {
+      "type": "buttonInit",
+      "topic": "buttonInit.buttonInit.buttonInit"
     },
-    "topicdata":{
-	"buttonInit":{
-	    "type" : "buttonInit",
-	    "topic" : "buttonInit.buttonInit.buttonInit"
-	},
-	"initialization": {
-	    "topic" : "button.initialization.initialization",
-	    "domain" : "initialization",
-	    "label" : "initialization"
-	},
-	"map":{
-	    "topic" : "button.map.map",
-	    "domain" : "map",
-	    "label" : "map"
-	},
-	"localization":{
-	    "topic" : "button.localization.localization",
-	    "domain" : "localization",
-	    "label" : "localization"
-	},
-	"mission": {
-	    "topic" : "button.mission.mission",
-	    "domain" : "mission",
-	    "label" : "mission"
-	},
-	"motion": {
-	    "topic" : "button.motion.motion",
-	    "domain" : "motion",
-	    "label" : "motion"
-	},
-	"sensing": {
-	    "topic" : "button.sensing.sensing",
-	    "domain" : "sensing",
-	    "label" : "sensing"
-	},
-	"detection": {
-	    "topic" : "button.detection.detection",
-	    "domain" : "detection",
-	    "label" : "detection"
-	},
-	"rosbag": {
-	    "topic" : "button.rosbag.rosbag",
-	    "domain" : "rosbag",
-	    "label" : "rosbag"
-	},
-	"play": {
-	    "topic" : "button.rosbag.play",
-	    "domain" : "rosbag",
-	    "label" : "play"
-	},
-	"gateway": {
-	    "topic" : "button.gateway.gateway",
-	    "domain" : "gateway",
-	    "label" : "gateway"
-	},
-	"on": {
-	    "topic" : "button.gateway.on",
-	    "domain" : "gateway",
-	    "label" : "on"
-	},
-	"ImageRaw":{
-	    "type" : "image",
-	    "topic" : "image.ImageRaw.ImageRaw",
-	    "label" : "ImageRaw"
-	},
-	"points_raw" : {
-	    "topic" : "rostopic.points_raw.points_raw",
-	    "type" : "rostopic"
-	},
-	"ndt_pose" : {
-	    "topic" : "rostopic.ndt_pose.ndt_pose",
-	    "type" : "rostopic"
-	},
-	"tf" : {
-	    "topic" : "rostopic.tf.tf",
-	    "type" : "rostopic"
-	},
-	"vector_map" : {
-	    "topic" : "rostopic.vector_map.vector_map",
-	    "type" : "rostopic"
-	},
-	"lane_waypoints_array" : {
-	    "topic" : "rostopic.lane_waypoints_array.lane_waypoints_array",
-	    "type" : "rostopic"
-	},
-	"downsampled_next_target_mark" : {
-	    "topic" : "rostopic.downsampled_next_target_mark.downsampled_next_target_mark",
-	    "type" : "rostopic"
-	},
-	"downsampled_trajectory_circle_mark" : {
-	    "topic" : "rostopic.downsampled_trajectory_circle_mark.downsampled_trajectory_circle_mark",
-	    "type" : "rostopic"
-	},
-	"map_pose" : {
-	    "topic" : "rostopic.map_pose.map_pose",
-	    "type" : "rostopic"
-	},
-	"get_param" : {
-	    "topic" : "getParam.get_param.get_param",
-	    "type" : "rostopic"
-	},
-	"clock" : {
-	    "topic" : "rostopic.clock.clock",
-	    "type" : "rostopic"
-	},
-	"initialpose" : {
-	    "topic" : "rostopic.initialpose.initialpose",
-	    "type" : "rostopic"
-	}
+    "settingSave": {
+      "type": "settingSaveLoad",
+      "topic": "settingSaveLoad.settingSave.settingSave"
+    },
+    "settingLoad": {
+      "type": "settingSaveLoad",
+      "topic": "settingSaveLoad.settingLoad.settingLoad"
+    },
+    "initialization": {
+      "topic": "button.initialization.initialization",
+      "domain": "initialization",
+      "label": "initialization"
+    },
+    "map": {
+      "topic": "button.map.map",
+      "domain": "map",
+      "label": "map"
+    },
+    "localization": {
+      "topic": "button.localization.localization",
+      "domain": "localization",
+      "label": "localization"
+    },
+    "mission": {
+      "topic": "button.mission.mission",
+      "domain": "mission",
+      "label": "mission"
+    },
+    "motion": {
+      "topic": "button.motion.motion",
+      "domain": "motion",
+      "label": "motion"
+    },
+    "sensing": {
+      "topic": "button.sensing.sensing",
+      "domain": "sensing",
+      "label": "sensing"
+    },
+    "detection": {
+      "topic": "button.detection.detection",
+      "domain": "detection",
+      "label": "detection"
+    },
+    "rosbag": {
+      "topic": "button.rosbag.rosbag",
+      "domain": "rosbag",
+      "label": "rosbag"
+    },
+    "play": {
+      "topic": "button.rosbag.play",
+      "domain": "rosbag",
+      "label": "play"
+    },
+    "gateway": {
+      "topic": "button.gateway.gateway",
+      "domain": "gateway",
+      "label": "gateway"
+    },
+    "on": {
+      "topic": "button.gateway.on",
+      "domain": "gateway",
+      "label": "on"
+    },
+    "rviz": {
+      "topic": "button.rviz.rviz",
+      "domain": "rviz",
+      "label": "rviz"
+    },
+    "setting": {
+      "topic": "settingParams.setting.setting",
+      "domain": "setting",
+      "label": "setting"
+    },
+    "ImageRaw": {
+      "type": "image",
+      "topic": "image.ImageRaw.ImageRaw",
+      "label": "ImageRaw"
+    },
+    "points_raw": {
+      "topic": "rostopic.points_raw.points_raw",
+      "type": "rostopic"
+    },
+    "ndt_pose": {
+      "topic": "rostopic.ndt_pose.ndt_pose",
+      "type": "rostopic"
+    },
+    "tf": {
+      "topic": "rostopic.tf.tf",
+      "type": "rostopic"
+    },
+    "vector_map": {
+      "topic": "rostopic.vector_map.vector_map",
+      "type": "rostopic"
+    },
+    "lane_waypoints_array": {
+      "topic": "rostopic.lane_waypoints_array.lane_waypoints_array",
+      "type": "rostopic"
+    },
+    "downsampled_next_target_mark": {
+      "topic": "rostopic.downsampled_next_target_mark.downsampled_next_target_mark",
+      "type": "rostopic"
+    },
+    "downsampled_trajectory_circle_mark": {
+      "topic": "rostopic.downsampled_trajectory_circle_mark.downsampled_trajectory_circle_mark",
+      "type": "rostopic"
+    },
+    "map_pose": {
+      "topic": "rostopic.map_pose.map_pose",
+      "type": "rostopic"
+    },
+    "get_param": {
+      "topic": "getParam.get_param.get_param",
+      "type": "rostopic"
+    },
+    "clock": {
+      "topic": "rostopic.clock.clock",
+      "type": "rostopic"
+    },
+    "initialpose": {
+      "topic": "rostopic.initialpose.initialpose",
+      "type": "rostopic"
     }
+  }
 }
 
 

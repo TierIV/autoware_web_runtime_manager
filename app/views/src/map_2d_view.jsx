@@ -19,6 +19,8 @@ export default class Map2DView extends React.Component {
         console.log("Map2DView.componentDidMount", this.props, this.state);
         const viewInstance = this.props.viewInstance;
         viewInstance.elementID = this.props.parentId;
+        const location = this.props.settingParams.map.location;
+        viewInstance.setLocation(location);
         viewInstance.run();
 
         this.setState({viewInstance: viewInstance});

@@ -29,6 +29,7 @@ export default class Map3DView extends React.Component {
         }
         else {
             if(visualizationObjectIDs.includes(CONST.VISUALIZATION_OBJECT.POINTS_MAP)) {
+                viewInstance.setLocation(this.props.settingParams.map.location);
                 viewInstance.onGetPointsMap();
             }
         }

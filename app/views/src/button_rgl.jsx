@@ -1,11 +1,13 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+
 import Responsive, {WidthProvider} from 'react-grid-layout';
+import Button from "./button";
+import {CONST} from "./const";
+import SettingModal from "./setting_modal";
+
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
-import Button from "./button";
-import ROSLaunchRequest from "./roslaunch_request";
-import {WEB_UI_URL} from "./dotenv";
+
 
 class GridSizeWrapper extends React.Component {
     render() {
@@ -34,6 +36,57 @@ class GridSizeWrapper extends React.Component {
 
 
 export default class ButtonRGL extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {modalIsOpen: false};
+
+    }
+
+    openModal() {
+        this.setState({modalIsOpen: true});
+    }
+
+    saveSettingModal(file_name) {
+        this.props.mqttClient.onPublish(CONST.SETTING_SAVE.LABEL, file_name);
+    }
+
+    loadSettingModal(file_name) {
+        this.props.mqttClient.onPublish(CONST.SETTING_LOAD.LABEL, file_name);
+    }
+
+    submitModal() {
+
+        const structure = this.props.structure;
+
+        this.setState({modalIsOpen: false});
+
+        const index = structure.nodes.findIndex(node => node.label === CONST.BUTTON.SETTING.LABEL);
+        const message = JSON.stringify(this.props.settingParams);
+        this.props.mqttClient.onPublish(CONST.BUTTON.SETTING.LABEL, message);
+        structure.nodes = this.getUpdatedNodes(
+            structure.nodes[index].id,
+            !structure.nodes[index].on,
+            structure.nodes);
+        // structure.nodes[index].span = (<span>{"setting..."}</span>);
+
+        this.props.updateStructure(structure);
+    }
+
+    closeModal() {
+
+        const structure = this.props.structure;
+
+        this.setState({modalIsOpen: false});
+
+        const index = structure.nodes.findIndex(node => node.label === CONST.BUTTON.SETTING.LABEL);
+
+        structure.nodes = this.getUpdatedNodes(
+            structure.nodes[index].id,
+            !structure.nodes[index].on,
+            structure.nodes);
+        this.props.updateStructure(structure);
+    }
+
     getLayout() {
         const layout = [];
         for (const node of this.props.structure.nodes) {
@@ -85,11 +138,12 @@ export default class ButtonRGL extends React.Component {
 
     componentWillMount() {
         this.initializeButtonRGLState();
+        this.setSaveLoadCallback();
 
         //mqtt callback method creating
         const mqttClient = this.props.mqttClient;
 
-        var buttonMethod = function (message) {
+        let buttonMethod = function (message) {
             //console.log(message.payloadString);
             const topic_factor = message.destinationName.split("/");
             const message_factor = topic_factor[2].split(".");
@@ -107,46 +161,65 @@ export default class ButtonRGL extends React.Component {
         for (const node of this.props.structure.nodes) {
             mqttClient.setCallback(node.label, buttonMethod.bind(this));
         }
+
+
     }
 
     render() {
         return (
-            <ResponsiveReactGridLayout
-                className="layout"
-                layout={this.getLayout()}
-                cols={this.props.structure.cols}
-                rowHeight={this.props.structure.rowHeight}
-            >
-                {this.getButtons()}
-            </ResponsiveReactGridLayout>
+            <div>
+                <SettingModal
+                    isActive={this.state.modalIsOpen}
+                    onClose={this.closeModal.bind(this)}
+                    onSubmit={this.submitModal.bind(this)}
+                    onSaveSetting={this.saveSettingModal.bind(this)}
+                    onLoadSetting={this.loadSettingModal.bind(this)}
+                    updateSettingParamsStructure={this.props.updateSettingParamsStructure}
+                    settingParams={this.props.settingParams}
+                />
+
+                <ResponsiveReactGridLayout
+                    className="layout"
+                    layout={this.getLayout()}
+                    cols={this.props.structure.cols}
+                    rowHeight={this.props.structure.rowHeight}
+                >
+                    {this.getButtons()}
+                </ResponsiveReactGridLayout>
+            </div>
         );
     }
 
     initializeButtonRGLState() {
         //const date = new Date();
-        //todo:change mqtt
         //const url = WEB_UI_URL+"/getRTMStatus?date="+date.getTime().toString();
 
-        var initMethod = function (message) {
+        let initMethod = function (message) {
             //console.log(message.payloadString);
             const json = JSON.parse(message.payloadString);
-            //console.log("initializeButtonRGLState", json);
+            console.log("initializeButtonRGLState", json);
             const structure = this.props.structure;
-            for (const topic_name of Object.keys(json)) {
+
+            let rtm_stateus = json["rtm_status"];
+            let parameter_info = json["parameter_info"];
+
+            for (const topic_name of Object.keys(rtm_stateus)) {
                 //console.log("topic:" + json[topic_name]);
                 const index = this.props.structure.nodes.findIndex(function (x) {
                     return x.label === topic_name;
                 });
                 if (index !== -1) {
-                    structure.nodes[index].enabled = json[topic_name]["enable"];
+                    structure.nodes[index].enabled = rtm_stateus[topic_name]["enable"];
                 }
             }
-            for (const topic_name of Object.keys(json)) {
+
+            for (const topic_name of Object.keys(rtm_stateus)) {
+                //console.log("topic:" + json[topic_name]);
                 const index = this.props.structure.nodes.findIndex(function (x) {
                     return x.label === topic_name;
                 });
                 if (index !== -1) {
-                    if (json[topic_name]["mode"] == "on" && index !== -1) {
+                    if (rtm_stateus[topic_name]["mode"] === "on" && index !== -1) {
                         structure.nodes = this.getUpdatedNodes(
                             this.props.structure.nodes[index].id,
                             !this.props.structure.nodes[index].on,
@@ -154,9 +227,40 @@ export default class ButtonRGL extends React.Component {
                     }
                 }
             }
+
+
+            let settingParams = parameter_info["settingParams"];
+
+            this.props.updateSettingParamsStructure(settingParams);
             this.props.updateStructure(structure);
         };
         this.props.mqttClient.setCallback("buttonInit", initMethod.bind(this));
+    }
+
+    setSaveLoadCallback(){
+        let saveMethod = function (message) {
+            //console.log(message.payloadString);
+            const save_file_list = JSON.parse(message.payloadString);
+            console.log("save file list", save_file_list);
+            if (save_file_list["settingParams"] !== "error"){
+                this.props.updateSettingParamsStructure(save_file_list["settingParams"]);
+            }else{
+                alert("Fail to save.");
+            }
+        };
+        this.props.mqttClient.setCallback("settingSave", saveMethod.bind(this));
+
+        let loadMethod = function (message) {
+            //console.log(message.payloadString);
+            const settingParams = JSON.parse(message.payloadString);
+
+            if (settingParams["settingParams"] !== "error") {
+                this.props.updateSettingParamsStructure(settingParams["settingParams"]);
+            }else{
+                alert("Fail to load.");
+            }
+        };
+        this.props.mqttClient.setCallback("settingLoad", loadMethod.bind(this));
 
     }
 
@@ -168,59 +272,17 @@ export default class ButtonRGL extends React.Component {
                 nodeID,
                 !this.props.structure.nodes[index].on,
                 this.props.structure.nodes);
-
-            const nodeDomain = structure.nodes[index].domain;
-            const nodeLabel = structure.nodes[index].label;
-            const nodeDisplay = structure.nodes[index].display;
-            const url = WEB_UI_URL + "/roslaunch/" + nodeDomain + "/" + nodeLabel + "/" + nodeID + "/" + (this.props.structure.nodes[index].on ? "on" : "off");
-
-            /*
-                structure.nodes[index].span = (<ROSLaunchRequest
-                    url={url}
-                    errorCallback={() => { return (<span>error</span>); }}
-                    isLoadingCallback={() => {
-                        return (<span>{(this.props.structure.nodes[index].on ? "loading.." : "killing..")}</span>); }
-                    }
-                    responseCallback={() => {
-                        if(index==0 && !this.props.structure.nodes[index].on) {
-                            location.reload();
-                        }
-                        return (<span>{nodeDisplay}</span>);
-                    }}
-                    defaultCallback={() => { return (<span>{nodeDisplay}</span>); }}
-                           />);
-            */
-
-            // set callback handlers
-            const label = structure.nodes[index].label;
-            const message = structure.nodes[index].on ? "on" : "off";
-            this.props.mqttClient.onPublish(label, message);
-            structure.nodes[index].span = (<span>{(structure.nodes[index].on ? "loading.." : "killing..")}</span>);
-
-
-            /*
-            let that = this;
-            const xhttpRequest = new XMLHttpRequest();
-            xhttpRequest.onreadystatechange = function() {
-                if (this.readyState == 4 && this.status == 200) {
-                    structure.nodes[index].isLoading = false;
-                    structure.nodes[index].on = !structure.nodes[index].on;
-                    if(index==0 && structure.nodes[index].on) {
-                        location.reload();
-                    }
-                    that.props.updateStructure(structure);
+            if (structure.nodes[index].label !== CONST.BUTTON.SETTING.LABEL) {
+                // set callback handlers
+                const label = structure.nodes[index].label;
+                const message = structure.nodes[index].on ? "on" : "off";
+                this.props.mqttClient.onPublish(label, message);
+                structure.nodes[index].span = (<span>{(structure.nodes[index].on ? "loading.." : "killing..")}</span>);
+            } else {
+                if (structure.nodes[index].on) {
+                    this.openModal();
                 }
-            };
-            if(structure.nodes[index].on){
-                structure.nodes[index].isLoading = true;
             }
-            else{
-                structure.nodes[index].isKilling = true;
-            }
-            xhttpRequest.open("GET", url, true);
-            xhttpRequest.send();
-            */
-
             this.props.updateStructure(structure);
         }
     }

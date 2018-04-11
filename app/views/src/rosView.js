@@ -29,7 +29,9 @@ export default class RosView {
 
         this.initialCameraPosition = {x: 0, y: 0, z: 300};
 
-        this.mqttClient = {};//set setMqttClient() called from index.jsx
+        this.mqttClient = {};
+        this.location = "";
+
     }
 
     setUpTopics() {
@@ -48,6 +50,10 @@ export default class RosView {
 
     setMqttClient(client) {
         this.mqttClient = client;
+    }
+
+    setLocation(loc){
+        this.location = loc
     }
 
     reset() {
@@ -435,7 +441,7 @@ export default class RosView {
                     for (const pcdFileName of that.pcdFileNames) {
                         if (!Object.keys(that.sceneData.pointsMap.threeJSObjects).includes(pcdFileName)) {
                             loader.load(
-                                WEB_UI_URL + "/getPCDFile/" + pcdFileName,
+                                WEB_UI_URL + "/getPCDFile/" + pcdFileName + "?location=" + that.location,
                                 function (mesh) {
                                     mesh.name = "pointsMap/" + pcdFileName;
                                     mesh.material.size = pointSize;
@@ -465,7 +471,10 @@ export default class RosView {
             threeJSObjects: {},
             isAdded: false,
         };
-        xhttpPCDs.open("GET", WEB_UI_URL + "/getPCDFileNames", true);
+
+
+        console.log(this.location);
+        xhttpPCDs.open("GET", WEB_UI_URL + "/getPCDFileNames?location=" + this.location, true);
         xhttpPCDs.send();
     }
 
@@ -620,17 +629,17 @@ export default class RosView {
                 }
             }
 
-            var geometry = new THREE.BufferGeometry();
+            let geometry = new THREE.BufferGeometry();
             geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
             geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
             geometry.computeBoundingSphere();
-            var material = new THREE.PointsMaterial({size: pointSize, vertexColors: THREE.VertexColors});
+            let material = new THREE.PointsMaterial({size: pointSize, vertexColors: THREE.VertexColors});
             const threeJSObject = new THREE.Points(geometry, material);
             threeJSObject.name = "pointsRaw";
             that.sceneData.pointsRaw = {
                 threeJSObject: threeJSObject,
                 isAdded: false,
-            }
+            };
 
             that.sceneData.pointsRaw.threeJSObject.position.x = that.vehiclePose.position.x;
             that.sceneData.pointsRaw.threeJSObject.position.y = that.vehiclePose.position.y;
@@ -641,13 +650,13 @@ export default class RosView {
                 that.sceneData.pointsRaw.threeJSObject.position.y = that.vehiclePose.position.y + that.tfBaseLinkToVelodyne.translation.y;
                 that.sceneData.pointsRaw.threeJSObject.position.z = that.vehiclePose.position.z + that.tfBaseLinkToVelodyne.translation.z;
 
-                var base_quaternion = new THREE.Quaternion(
+                let base_quaternion = new THREE.Quaternion(
                     that.vehiclePose.orientation.x,
                     that.vehiclePose.orientation.y,
                     that.vehiclePose.orientation.z,
                     that.vehiclePose.orientation.w
                 );
-                var vel_quaternion = new THREE.Quaternion(
+                let vel_quaternion = new THREE.Quaternion(
                     that.tfBaseLinkToVelodyne.rotation.x,
                     that.tfBaseLinkToVelodyne.rotation.y,
                     that.tfBaseLinkToVelodyne.rotation.z,
@@ -671,7 +680,7 @@ export default class RosView {
         };
 
         var getWayPointMethod = function (msg) {
-            var message = JSON.parse(msg.payloadString)
+            let message = JSON.parse(msg.payloadString);
 
             console.log("waypoint sub");
             console.log(message);

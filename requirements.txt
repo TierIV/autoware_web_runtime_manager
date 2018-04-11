@@ -3,3 +3,4 @@ Flask-Cors==3.0.3
 python-dotenv==0.6.5
 pillow==4.2.1
 Cython==0.23.4
+PyYAML==3.11

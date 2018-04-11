@@ -41,7 +41,7 @@ if args.force == "force":
     call(["rm", "-f", "map"])
     call(["rm", "-f", "map.zip"])
     call(["wget", "https://autoware.blob.core.windows.net/web-ui-resouces/map.zip"])
-    call(["unzip", "-d map", "map.zip"])
+    call(["unzip", "map.zip", "-d", "map"])
     call(["rm", "-f", "map.zip"])        
 else:
     chdir("{}/controllers/res".format(rootpath))
@@ -49,7 +49,7 @@ else:
     if "map" not in file_names:
         call(["rm", "-f", "map.zip"])
         call(["wget", "https://autoware.blob.core.windows.net/web-ui-resouces/map.zip"])
-        call(["unzip", "-d map" "map.zip"])
+        call(["unzip", "map.zip", "-d", "map"])
         call(["rm", "-f", "map.zip"])
     
 

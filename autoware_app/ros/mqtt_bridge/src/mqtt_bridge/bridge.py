@@ -77,9 +77,6 @@ class RosToMqttBridge(Bridge):
         payload = bytearray(self._serialize(extract_values(msg)))
         self._mqtt_client.publish(topic=self._topic_to, payload=payload)
 
-        #todo:when sending to javascript, I dont know how converrt from selialized message to json.
-        #So this method send naked data.The data shorld be convert serialized data.
-        #self._mqtt_client.publish(topic=self._topic_to, payload=json.dumps(extract_values(msg)))
 
 
 class MqttToRosBridge(Bridge):

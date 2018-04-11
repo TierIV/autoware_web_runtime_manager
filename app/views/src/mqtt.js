@@ -35,6 +35,24 @@ export default class MqttWrapper {
                     "callback": function () {
                     }
                 },
+                "settingSave": {
+                    "domain": CONST.SETTING_SAVE.DOMAIN,
+                    "label": CONST.SETTING_SAVE.LABEL,
+                    "type": "settingSaveLoad",
+                    "topic": "",
+                    "erroePublishMessage": "settingSaveLoad topic can not publish.",
+                    "callback": function () {
+                    }
+                },
+                "settingLoad": {
+                    "domain": CONST.SETTING_LOAD.DOMAIN,
+                    "label": CONST.SETTING_LOAD.LABEL,
+                    "type": "settingSaveLoad",
+                    "topic": "",
+                    "erroePublishMessage": "settingSaveLoad topic can not publish.",
+                    "callback": function () {
+                    }
+                },
                 "initialization": {
                     "domain": CONST.BUTTON.INITIALIZATION.DOMAIN,
                     "label": CONST.BUTTON.INITIALIZATION.LABEL,
@@ -134,6 +152,24 @@ export default class MqttWrapper {
                     "callback": function () {
                     }
                 },
+                "rviz": {
+                    "domain": CONST.BUTTON.RVIZ.DOMAIN,
+                    "label": CONST.BUTTON.RVIZ.LABEL,
+                    "type": "button",
+                    "topic": "",
+                    "erroePublishMessage": "rviz topic can not publish.",
+                    "callback": function () {
+                    }
+                },
+                "setting": {
+                    "domain": CONST.BUTTON.SETTING.DOMAIN,
+                    "label": CONST.BUTTON.SETTING.LABEL,
+                    "type": "button",
+                    "topic": "",
+                    "erroePublishMessage": "setting topic can not publish.",
+                    "callback": function () {
+                    }
+                },
                 "ImageRaw": {
                     "domain": CONST.VISUALIZATION_OBJECT.IMAGE_RAW,
                     "label": CONST.VISUALIZATION_OBJECT.IMAGE_RAW,
@@ -198,9 +234,11 @@ export default class MqttWrapper {
                     }
                 }
             }
-        }
+        };
 
-        this.mqttClient = new Paho.MQTT.Client(this.host, this.port, "clientId");
+        let time = new Date();
+        let clientId = "wrmClient" + String(time.getTime());
+        this.mqttClient = new Paho.MQTT.Client(this.host, this.port, clientId);
 
         this.mqttClient.onConnectionLost = onConnectionLost;
         this.mqttClient.onMessageArrived = onMessageArrived.bind(this);
@@ -215,7 +253,6 @@ export default class MqttWrapper {
             this.onPublish("buttonInit", "GET");
         }
 
-
         function onMessageArrived(message) {
 
             const topic_factor = message.destinationName.split("/");
@@ -228,13 +265,13 @@ export default class MqttWrapper {
         function onConnectionLost(responseObject) {
             if (responseObject.errorCode !== 0) {
                 console.log("onConnectionLost:" + responseObject.errorMessage);
+
                 alert("disconnect mqtt");
             }
         }
 
-
         const url = WEB_UI_URL + "/topicData";
-        const data = new FormData();
+        let data = new FormData();
         data.append("name", "test");
         fetch(url,
             {
@@ -263,18 +300,18 @@ export default class MqttWrapper {
             .catch((e) => {
                 console.error(e);
             });
-
     }
 
-    onPublish(label, msg) {
-        //console.log(label,msg);
+    //arg label:set key of this.topics.topicdata
+    onPublish(label, msg){
+        // console.log(label,msg);
         try {
             var message = new Paho.MQTT.Message(msg);
             message.destinationName = this.getPublishTopicName(label);
             this.mqttClient.send(message);
 
-            //console.log("pub topic name:" + message.destinationName);
-            //console.log("pub message:" + message.payloadString);
+            // console.log("pub topic name:" + message.destinationName);
+            // console.log("pub message:" + message.payloadString);
         } catch (error) {
             console.log("error:" + error);
             if ("errorPublishMessage" in this.topics["topicdata"][label]) {
@@ -292,6 +329,8 @@ export default class MqttWrapper {
         //console.log("topic subscribe:" + topic_name);
     }
 
+
+
     //label:set key of topicdata of this.topics
     onSubscribeTopicWithMethod(label, method) {
         const topic_name = this.getSubscribeTopicName(label);
@@ -301,14 +340,14 @@ export default class MqttWrapper {
         //console.log("topic subscribe:" + topic_name);
     }
 
-
-    //label:set key of topicdata of this.topics
+    //arg label:set key of this.topics.topicdata
     unSubscribeTopic(label) {
         const topic_name = this.getSubscribeTopicName(label);
         this.mqttClient.unsubscribe(topic_name);
         //console.log("topic unsubscribe:" + topic_name);
     }
 
+    //arg label:set key of this.topics.topicdata
     setCallback(label, callback) {
         //console.log(label + " callback set");
         //console.log(callback);
@@ -320,10 +359,10 @@ export default class MqttWrapper {
     }
 
     //header and direction is fixed.These are subscribed from web server
-    //body is topic of topicdata of this.topics
+    //body is topic of this.topics.topicdata
     getPublishTopicName(label) {
         try {
-            const head = this.topics["fixeddata"];
+            const head = this.topics["fixeddata"]
             const header = "/" + head["userid"] + "." + head["carid"];
             const direction = "/" + head["toAutoware"];
             const body = "/" + this.topics["topicdata"][label]["topic"];
@@ -334,10 +373,10 @@ export default class MqttWrapper {
     }
 
     //header and direction is fixed.These are subscribed from web server
-    //body is topic of topicdata of this.topics
+    //body is topic of this.topics.topicdata
     getSubscribeTopicName(label) {
         try {
-            const head = this.topics["fixeddata"];
+            const head = this.topics["fixeddata"]
             const header = "/" + head["userid"] + "." + head["carid"];
             const direction = "/" + head["fromAutoware"];
             const body = "/" + this.topics["topicdata"][label]["topic"];
